@@ -200,7 +200,7 @@ public class ContentHandler : MonoBehaviour
 
                     var vert = paragraph.transform.parent.GetComponent<VerticalLayoutGroup>();
                     vert.enabled = false;
-                    await Task.Delay(200);
+                    await Task.Delay(10);
                     vert.enabled = true;
 
 

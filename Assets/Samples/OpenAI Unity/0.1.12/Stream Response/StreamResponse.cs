@@ -62,8 +62,20 @@ namespace OpenAI
                         Content = s
                     }
             );
-            if (message.Count > 3)
+            if (message.Count > 2)
                 message.Dequeue();
+            var messageToSend = new Queue<ChatMessage>();
+            messageToSend.Enqueue(
+                    new ChatMessage()
+                    {
+                        Role = "user",
+                        Content = BuildInitialMessage()
+                    }
+            );
+            for (int i = 0; i < message.Count; i++)
+            {
+                messageToSend.Enqueue(message.ToArray()[i]);
+            }
             var gptModel = "";
             if (model == GPTModel.GPT35)
                 gptModel = "gpt-3.5-turbo";

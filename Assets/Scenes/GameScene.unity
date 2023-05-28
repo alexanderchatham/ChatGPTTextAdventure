@@ -2252,7 +2252,6 @@ MonoBehaviour:
   text: {fileID: 232237983}
   handler: {fileID: 499436301}
   uiManager: {fileID: 499436302}
-  PlayerName: Alex
   settingsPanel: {fileID: 680262885}
   initialMessage: 'You are now a text adventure game generator. Generate a paragraph
     for a new text adventure game along with 3 choices. Use this JSON format for
@@ -4809,7 +4808,7 @@ MonoBehaviour:
   m_Direction: 0
   m_MinValue: 0
   m_MaxValue: 2
-  m_WholeNumbers: 0
+  m_WholeNumbers: 1
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
