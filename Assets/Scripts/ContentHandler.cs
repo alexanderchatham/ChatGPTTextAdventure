@@ -28,7 +28,18 @@ public class ContentHandler : MonoBehaviour
 
 
     private bool madeChoice = false;
-    public string choiceFormatString;
+    private string choiceFormatString = 
+        " If using quotes in the story use ' instead of \"." +
+        " Please continue the story and use this JSON format for your response. \n" +
+        " { \"character\": \"character name\", \"paragraph\":\"current part of the story goes here\",  " +
+        "   \"A\": \"new choice\",     \"B\": \"new choice\",     \"C\": \"new choice\"   }";
+
+    internal void setPlayerName(string playerName)
+    {
+        choiceFormatString = choiceFormatString.Replace("Alex", playerName);
+
+    }
+
     private string choice;
     public void selectOption(string option)
     {
@@ -52,8 +63,10 @@ public class ContentHandler : MonoBehaviour
 
     public string choice_prompt_format(string option)
     {
-        choice = "The players name is " + StreamResponse.PlayerName + ". " + option + choiceFormatString;
-        choice += " The current paragraph for the story is: " + current.paragraph + " The player has chosen this choice";
+        choice = option + " is the option chosen by the user. ";
+        //choice += " The current paragraph for the story is: " + current.paragraph;
+        choice += choiceFormatString;
+        Debug.Log(choice);
         return choice;
     }
 
@@ -68,9 +81,10 @@ public class ContentHandler : MonoBehaviour
             " \"paragraph\":\"current part of the story goes here\",\n" +
             "     \"A\": \"New Adventure\",\n" +
             "     \"B\": \"New Adventure\",\n" +
-            "     \"C\": \"New Adventure\",\n" +
+            "     \"C\": \"New Adventure\"\n" +
             "   }\n" +
-            "If using quotes in the story use ' instead of \"";
+            "If using quotes in the story use ' instead of \" ."+
+            " Make sure to not send back extra commas in the JSON after C.";
     }
 
     public static string SanitizeJSONString(string s)
@@ -86,9 +100,8 @@ public class ContentHandler : MonoBehaviour
         else
         {
             print("no json found trying again");
-            s += "}";
             // No valid JSON object found
-            match = Regex.Match(s, @"\{.*\}", RegexOptions.Singleline);
+            match = Regex.Match(s+"}", @"\{.*\}", RegexOptions.Singleline);
             if (match.Success)
             {
                 print("json found");
@@ -97,9 +110,19 @@ public class ContentHandler : MonoBehaviour
             }
             else
             {
-                print("no json found");
-                // No valid JSON object found
-                return null;
+                match = Regex.Match(s + "\"}", @"\{.*\}", RegexOptions.Singleline);
+                if (match.Success)
+                {
+                    print("json found");
+                    string json = match.Value;
+                    return json;
+                }
+                else
+                {
+                    print("no json found");
+                    // No valid JSON object found
+                    return null;
+                }
             }
         }
     }
@@ -111,17 +134,26 @@ public class ContentHandler : MonoBehaviour
 
     async void getContent()
     {
-        await Task.Delay(200);
+        await Task.Delay(1000);
         string s = StreamResponse.finalString;
         print(s);
-        s = SanitizeJSONString(s);
-        if (s != null)
+        try
+        {
+            current = JsonUtility.FromJson<story>(s);
+
+        }
+        catch (Exception)
+        {
+
+            s = SanitizeJSONString(s);
+            current = JsonUtility.FromJson<story>(s);
+        }
+        if (current != null)
         {
 
 
             try
             {
-                current = JsonUtility.FromJson<story>(s);
                 if (!String.IsNullOrEmpty(current.paragraph))
                 {
                     paragraph.GetComponent<ContentSizeFitter>().enabled = true;

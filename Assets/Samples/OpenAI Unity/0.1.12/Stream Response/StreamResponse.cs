@@ -14,36 +14,66 @@ namespace OpenAI
     {
         [SerializeField] private TextMeshProUGUI text;
         public ContentHandler handler;
+        public UIManager uiManager; // Add this line
         private OpenAIApi openai;
         private CancellationTokenSource token = new CancellationTokenSource();
-        public string PlayerName;
         private void Start()
         {
-            TextAsset textAsset = Resources.Load<TextAsset>("APIKEY");
+            TextAsset textAsset;
+            if (model == GPTModel.GPT4)
+                textAsset = Resources.Load<TextAsset>("APIKEYGPT4");
+            else
+                textAsset = Resources.Load<TextAsset>("APIKEY");
+            //Model = "gpt-3.5-turbo",
             var _apiKey = textAsset.text;
             openai = new OpenAIApi(_apiKey);
-            handler.choiceFormatString = handler.choiceFormatString.Replace("Alex", PlayerName);
-            SendMessage(initialMessage+" The characters name is "+PlayerName);
         }
-        public string initialMessage = "You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. Use this JSON format for your response. { \"character\": \"character name\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\",   } ";
+        public GameObject settingsPanel;
+        public void StartStory()
+        {
+            handler.setPlayerName(uiManager.GetCharacterName());
+            settingsPanel.SetActive(false);
+            SendMessage(BuildInitialMessage()); // Replace the old SendMessage call
 
+        }
+        private string BuildInitialMessage()
+        {
+            // Use the settings from the UIManager to build the initial message
+            string message = $"You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. The game theme is {uiManager.GetTheme()}, the character's name is {uiManager.GetCharacterName()}, the character's gender is {uiManager.GetCharacterGender()}, the story length is {uiManager.GetStoryLength()}, the genre is {uiManager.GetGenre()}. " + initialMessage;
+            return message;
+        }
 
+        public string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\",   } ";
+        public enum GPTModel
+        {
+            GPT35,
+            GPT4
+
+        }
+        public GPTModel model;
+        Queue<ChatMessage> message = new Queue<ChatMessage>();
         public void SendMessage(string s)
         {
 
-            var message = new List<ChatMessage>
-            {
-                new ChatMessage()
-                {
-                    Role = "user",
-                    Content = s
-                }
-            };
-
+            message.Enqueue(
+                    new ChatMessage()
+                    {
+                        Role = "user",
+                        Content = s
+                    }
+            );
+            if (message.Count > 3)
+                message.Dequeue();
+            var gptModel = "";
+            if (model == GPTModel.GPT35)
+                gptModel = "gpt-3.5-turbo";
+            else if (model == GPTModel.GPT4)
+                gptModel = "gpt-4";
+                //Model = "gpt-3.5-turbo",
             openai.CreateChatCompletionAsync(new CreateChatCompletionRequest()
             {
-                Model = "gpt-3.5-turbo",
-                Messages = message,
+                Model = gptModel,
+                Messages = message.ToList<ChatMessage>(),
                 Stream = true
             }, HandleResponse
             ,  handler.contentLinker
