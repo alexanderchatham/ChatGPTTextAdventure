@@ -72,3 +72,5 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Assets/Resources/APIKEY.txt
 Assets/Resources/APIKEY.txt.meta
+Assets/Resources/APIKEYGPT4.txt
+Assets/Resources/APIKEYGPT4.txt.meta
