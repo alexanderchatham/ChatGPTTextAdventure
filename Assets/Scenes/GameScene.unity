@@ -2253,12 +2253,7 @@ MonoBehaviour:
   handler: {fileID: 499436301}
   uiManager: {fileID: 499436302}
   settingsPanel: {fileID: 680262885}
-  initialMessage: 'You are now a text adventure game generator. Generate a paragraph
-    for a new text adventure game along with 3 choices. Use this JSON format for
-    your response. { "character": "character name", "paragraph":"current part of
-    the story goes here",     "A": "New Adventure",     "B": "New Adventure",    
-    "C": "New Adventure",   } . If using quotes in the story use '' instead of "'
-  model: 1
+  model: 0
   finalString: 
 --- !u!4 &499436300
 Transform:

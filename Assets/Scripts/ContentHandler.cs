@@ -30,15 +30,8 @@ public class ContentHandler : MonoBehaviour
     private bool madeChoice = false;
     private string choiceFormatString = 
         " If using quotes in the story use ' instead of \"." +
-        " Please continue the story and use this JSON format for your response. \n" +
-        " { \"character\": \"character name\", \"paragraph\":\"current part of the story goes here\",  " +
-        "   \"A\": \"new choice\",     \"B\": \"new choice\",     \"C\": \"new choice\"   }";
+        " Please continue the story by writing a new paragraph and updating the summary of the story and use this JSON from the last section of the story to format your response for the next section of the story. Remember to only send back the JSON. \n";
 
-    internal void setPlayerName(string playerName)
-    {
-        choiceFormatString = choiceFormatString.Replace("Alex", playerName);
-
-    }
 
     private string choice;
     public void selectOption(string option)
@@ -51,40 +44,25 @@ public class ContentHandler : MonoBehaviour
             return;
         madeChoice = true;
         choice = choice_prompt_format(option);
+        /*
         if (option == "A")
             choice += current.A;
         if (option == "B")
             choice += current.B;
         if (option =="B")
             choice+= current.B;
+        */
         Debug.Log(choice);
         StreamResponse.SendMessage(choice);
     }
 
     public string choice_prompt_format(string option)
     {
-        choice = option + " is the option chosen by the user. ";
+        choice = option + " is the option the player chose in the following paragraph, use this when creating the new paragraph. ";
         //choice += " The current paragraph for the story is: " + current.paragraph;
-        choice += choiceFormatString;
+        choice += choiceFormatString + StreamResponse.finalString + "\n\n[Remember to only send back JSON in the format above] \n";
         Debug.Log(choice);
         return choice;
-    }
-
-    public string system_prompt()
-    {
-        return "You are now a text adventure game generator. " +
-            "Generate a paragraph for a new text adventure " +
-            "game along with 3 choices. Use this JSON format " +
-            "for your response:\n" +
-            "{\n" +
-            " \"character\": \"character name\",\n" +
-            " \"paragraph\":\"current part of the story goes here\",\n" +
-            "     \"A\": \"New Adventure\",\n" +
-            "     \"B\": \"New Adventure\",\n" +
-            "     \"C\": \"New Adventure\"\n" +
-            "   }\n" +
-            "If using quotes in the story use ' instead of \" ."+
-            " Make sure to not send back extra commas in the JSON after C.";
     }
 
     public static string SanitizeJSONString(string s)
@@ -223,6 +201,7 @@ public class ContentHandler : MonoBehaviour
 public class story
 {
     public string character ;
+    public string summary;
     public string paragraph ;
     public string A ;
     public string B ;

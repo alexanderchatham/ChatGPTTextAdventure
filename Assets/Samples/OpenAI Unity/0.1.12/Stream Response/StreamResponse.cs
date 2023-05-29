@@ -31,7 +31,6 @@ namespace OpenAI
         public GameObject settingsPanel;
         public void StartStory()
         {
-            handler.setPlayerName(uiManager.GetCharacterName());
             settingsPanel.SetActive(false);
             SendMessage(BuildInitialMessage()); // Replace the old SendMessage call
 
@@ -43,7 +42,7 @@ namespace OpenAI
             return message;
         }
 
-        public string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\",   } ";
+        private string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"summary\": \"summarize the entire story so far here\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\",   } ";
         public enum GPTModel
         {
             GPT35,
@@ -51,31 +50,17 @@ namespace OpenAI
 
         }
         public GPTModel model;
-        Queue<ChatMessage> message = new Queue<ChatMessage>();
         public void SendMessage(string s)
         {
 
-            message.Enqueue(
+            List<ChatMessage> message = new List<ChatMessage>();
+            message.Add(
                     new ChatMessage()
                     {
                         Role = "user",
                         Content = s
                     }
             );
-            if (message.Count > 2)
-                message.Dequeue();
-            var messageToSend = new Queue<ChatMessage>();
-            messageToSend.Enqueue(
-                    new ChatMessage()
-                    {
-                        Role = "user",
-                        Content = BuildInitialMessage()
-                    }
-            );
-            for (int i = 0; i < message.Count; i++)
-            {
-                messageToSend.Enqueue(message.ToArray()[i]);
-            }
             var gptModel = "";
             if (model == GPTModel.GPT35)
                 gptModel = "gpt-3.5-turbo";
@@ -85,7 +70,7 @@ namespace OpenAI
             openai.CreateChatCompletionAsync(new CreateChatCompletionRequest()
             {
                 Model = gptModel,
-                Messages = message.ToList<ChatMessage>(),
+                Messages = message,
                 Stream = true
             }, HandleResponse
             ,  handler.contentLinker
