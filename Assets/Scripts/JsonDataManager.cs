@@ -6,6 +6,7 @@ public static class JsonDataManager
 {
     static readonly string directoryPath = Application.persistentDataPath;
 
+
     public static void SaveJson<T>(T data, string fileName)
     {
         string filePath = Path.Combine(directoryPath, fileName + ".json");
@@ -37,6 +38,28 @@ public static class JsonDataManager
         return JsonUtility.FromJson<T>(jsonData);
     }
 
+    public static T LoadFirstSave<T>() where T: new()
+    {
+        T t = new T();
+        string filePath = Path.Combine(directoryPath, "LastSave");
+        if (!Directory.Exists(filePath))
+        {
+            Directory.CreateDirectory(filePath);
+
+        }
+        else
+        {
+            filePath = Path.Combine(directoryPath, "save.json");
+            if (File.Exists(filePath))
+            {
+                string jsonData = File.ReadAllText(filePath);
+                t = JsonUtility.FromJson<T>(jsonData);
+            }
+        }
+
+        return t;
+    }
+
     public static List<T> LoadAllJsonFiles<T>() where T : new()
     {
         List<T> dataList = new List<T>();
@@ -54,4 +77,6 @@ public static class JsonDataManager
 
         return dataList;
     }
+
+    
 }

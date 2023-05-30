@@ -28,10 +28,9 @@ namespace OpenAI
             var _apiKey = textAsset.text;
             openai = new OpenAIApi(_apiKey);
         }
-        public GameObject settingsPanel;
         public void StartStory()
         {
-            settingsPanel.SetActive(false);
+            FindObjectOfType<MenuManager>().ShowGamePanel();
             SendMessage(BuildInitialMessage()); // Replace the old SendMessage call
 
         }
@@ -42,7 +41,7 @@ namespace OpenAI
             return message;
         }
 
-        private string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"summary\": \"summarize the entire story so far here\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\",   } ";
+        private string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"summary\": \"summarize the entire story so far here\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\"  } ";
         public enum GPTModel
         {
             GPT35,
@@ -52,7 +51,7 @@ namespace OpenAI
         public GPTModel model;
         public void SendMessage(string s)
         {
-
+            Debug.Log(s);
             List<ChatMessage> message = new List<ChatMessage>();
             message.Add(
                     new ChatMessage()

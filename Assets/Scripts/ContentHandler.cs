@@ -52,7 +52,6 @@ public class ContentHandler : MonoBehaviour
         if (option =="B")
             choice+= current.B;
         */
-        Debug.Log(choice);
         StreamResponse.SendMessage(choice);
     }
 
@@ -60,8 +59,7 @@ public class ContentHandler : MonoBehaviour
     {
         choice = option + " is the option the player chose in the following paragraph, use this when creating the new paragraph. ";
         //choice += " The current paragraph for the story is: " + current.paragraph;
-        choice += choiceFormatString + StreamResponse.finalString + "\n\n[Remember to only send back JSON in the format above] \n";
-        Debug.Log(choice);
+        choice += choiceFormatString + StreamResponse.finalString + "\n\n[Remember to ONLY return JSON] \n";
         return choice;
     }
 
@@ -71,7 +69,6 @@ public class ContentHandler : MonoBehaviour
         Match match = Regex.Match(s, @"\{.*\}", RegexOptions.Singleline);
         if (match.Success)
         {
-            print("json found");
             string json = match.Value;
             return json;
         }
@@ -82,7 +79,6 @@ public class ContentHandler : MonoBehaviour
             match = Regex.Match(s+"}", @"\{.*\}", RegexOptions.Singleline);
             if (match.Success)
             {
-                print("json found");
                 string json = match.Value;
                 return json;
             }
@@ -91,7 +87,6 @@ public class ContentHandler : MonoBehaviour
                 match = Regex.Match(s + "\"}", @"\{.*\}", RegexOptions.Singleline);
                 if (match.Success)
                 {
-                    print("json found");
                     string json = match.Value;
                     return json;
                 }
@@ -114,7 +109,7 @@ public class ContentHandler : MonoBehaviour
     {
         await Task.Delay(1000);
         string s = StreamResponse.finalString;
-        print(s);
+        Debug.Log(s);
         try
         {
             current = JsonUtility.FromJson<story>(s);
@@ -138,7 +133,6 @@ public class ContentHandler : MonoBehaviour
                     buttons.alpha = 1;
                     buttons.interactable = true;
                     madeChoice = false;
-                    print(current.ToString());
                     character.text = "Character: " + current.character;
                     paragraph.text = current.paragraph;
 
