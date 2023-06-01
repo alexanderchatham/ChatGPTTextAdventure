@@ -17,8 +17,14 @@ namespace OpenAI
         public UIManager uiManager; // Add this line
         private OpenAIApi openai;
         private CancellationTokenSource token = new CancellationTokenSource();
+        private ChatMessage systemMessage;
         private void Start()
         {
+            systemMessage = new ChatMessage()
+            {
+                Role = "user",
+                Content = "You are an assistant that only speaks JSON. Do not write normal text."
+            };
             TextAsset textAsset;
             if (model == GPTModel.GPT4)
                 textAsset = Resources.Load<TextAsset>("APIKEYGPT4");
@@ -53,6 +59,7 @@ namespace OpenAI
         {
             Debug.Log(s);
             List<ChatMessage> message = new List<ChatMessage>();
+            message.Add(systemMessage);
             message.Add(
                     new ChatMessage()
                     {

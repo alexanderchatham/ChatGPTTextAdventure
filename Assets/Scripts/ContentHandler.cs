@@ -19,6 +19,7 @@ public class ContentHandler : MonoBehaviour
     public GameObject restartButton;
     private OpenAI.StreamResponse StreamResponse;
 
+    
     private void Start()
     {
         StreamResponse = GetComponent<OpenAI.StreamResponse>();
