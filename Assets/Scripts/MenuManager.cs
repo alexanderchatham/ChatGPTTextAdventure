@@ -5,6 +5,7 @@ public class MenuManager : MonoBehaviour
 {
     public CanvasGroup mainMenuPanel;
     public CanvasGroup newGamePanel;
+    public CanvasGroup settingsPanel;
     public CanvasGroup loadGamePanel;
     public CanvasGroup gamePanel;
     public Button continueButton;
@@ -38,13 +39,14 @@ public class MenuManager : MonoBehaviour
         panel.interactable = true;
         panel.blocksRaycasts = true;
 
-        while (Time.time < startTime + fadeTime)
+        while (Time.time < startTime + fadeTime && panel.interactable)
         {
             panel.alpha = (Time.time - startTime) / fadeTime;
             yield return null;
         }
 
-        panel.alpha = 1f;
+        if(panel.interactable)
+            panel.alpha = 1f;
     }
 
     void SetPanelInactive(CanvasGroup panel)
@@ -59,14 +61,25 @@ public class MenuManager : MonoBehaviour
         SetPanelInactive(newGamePanel);
         SetPanelInactive(loadGamePanel);
         SetPanelInactive(gamePanel);
+        SetPanelInactive(settingsPanel);
         StartCoroutine(FadeIn(mainMenuPanel));
     }
+    public void ShowSettingsPanel()
+    {
+        SetPanelInactive(newGamePanel);
+        SetPanelInactive(loadGamePanel);
+        SetPanelInactive(gamePanel);
+        SetPanelInactive(mainMenuPanel);
+        StartCoroutine(FadeIn(settingsPanel));
+    }
+
 
     public void ShowNewGamePanel()
     {
         SetPanelInactive(mainMenuPanel);
         SetPanelInactive(loadGamePanel);
         SetPanelInactive(gamePanel);
+        SetPanelInactive(settingsPanel);
         StartCoroutine(FadeIn(newGamePanel));
     }
 
@@ -75,6 +88,7 @@ public class MenuManager : MonoBehaviour
         SetPanelInactive(mainMenuPanel);
         SetPanelInactive(loadGamePanel);
         SetPanelInactive(newGamePanel);
+        SetPanelInactive(settingsPanel);
         StartCoroutine(FadeIn(gamePanel));
     }
 
@@ -83,6 +97,7 @@ public class MenuManager : MonoBehaviour
         SetPanelInactive(mainMenuPanel);
         SetPanelInactive(newGamePanel);
         SetPanelInactive(gamePanel);
+        SetPanelInactive(settingsPanel);
         StartCoroutine(FadeIn(loadGamePanel));
     }
 

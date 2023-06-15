@@ -31,14 +31,21 @@ public class ContentHandler : MonoBehaviour
     private bool madeChoice = false;
     private string choiceFormatString = 
         " If using quotes in the story use ' instead of \"." +
-        " Please continue the story by writing a new paragraph and updating the summary of the story and use this JSON from the last section of the story to format your response for the next section of the story. Remember to only send back the JSON. \n";
+        " Please continue the story by writing a new paragraph and updating the summary of the story and use this JSON from the last section of the story to format your response for the next section of the story. Remember to only send back the response JSON. \n";
 
 
+    public ScrollRect scrollRect;
+
+    public void ScrollToTop()
+    {
+        scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
     private string choice;
     public void selectOption(string option)
     {
+        ScrollToTop();
+        FindObjectOfType<LerpTextMeshPro>().Reset();
         Debug.Log(option);
-        paragraph.GetComponent<ContentSizeFitter>().enabled = false;
         buttons.alpha = 0;
         buttons.interactable = false;
         if (madeChoice)
@@ -120,8 +127,32 @@ public class ContentHandler : MonoBehaviour
         {
 
             s = SanitizeJSONString(s);
-            current = JsonUtility.FromJson<story>(s);
+            try
+            {
+                current = JsonUtility.FromJson<story>(s);
+
+            }
+            catch (Exception e)
+            {
+                buttons.alpha = 1;
+                buttons.interactable = true;
+                a.transform.parent.gameObject.SetActive(false);
+                b.transform.parent.gameObject.SetActive(false);
+                c.transform.parent.gameObject.SetActive(false);
+                restartButton.SetActive(true);
+                restartButton.GetComponentInChildren<TextMeshProUGUI>().text = "ChatGPT Error";
+                Console.WriteLine(e);
+                throw;
+                
+            }
+            
         }
+        /*
+        var vert = paragraph.transform.parent.GetComponent<VerticalLayoutGroup>();
+        vert.enabled = false;
+        await Task.Delay(100);
+        vert.enabled = true;
+        */
         if (current != null)
         {
 
@@ -171,10 +202,7 @@ public class ContentHandler : MonoBehaviour
                             c.transform.parent.gameObject.SetActive(true);
                     }
 
-                    var vert = paragraph.transform.parent.GetComponent<VerticalLayoutGroup>();
-                    vert.enabled = false;
-                    await Task.Delay(10);
-                    vert.enabled = true;
+                    
 
 
                 }
@@ -184,6 +212,7 @@ public class ContentHandler : MonoBehaviour
                 a.transform.parent.gameObject.SetActive(false);
                 b.transform.parent.gameObject.SetActive(false);
                 c.transform.parent.gameObject.SetActive(false);
+                restartButton.GetComponentInChildren<TextMeshProUGUI>().text = "Restart";
                 restartButton.SetActive(true);
                 Console.WriteLine(e);
                 throw;

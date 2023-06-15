@@ -42,8 +42,9 @@ namespace OpenAI
         }
         private string BuildInitialMessage()
         {
+            //the story length is {uiManager.GetStoryLength()},
             // Use the settings from the UIManager to build the initial message
-            string message = $"You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. The game theme is {uiManager.GetTheme()}, the character's name is {uiManager.GetCharacterName()}, the character's gender is {uiManager.GetCharacterGender()}, the story length is {uiManager.GetStoryLength()}, the genre is {uiManager.GetGenre()}. " + initialMessage;
+            string message = $"You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. The game theme is {uiManager.GetTheme()}, the character's name is {uiManager.GetCharacterName()}, the character's gender is {uiManager.GetCharacterGender()},  the genre is {uiManager.GetGenre()}. " + initialMessage;
             return message;
         }
 
