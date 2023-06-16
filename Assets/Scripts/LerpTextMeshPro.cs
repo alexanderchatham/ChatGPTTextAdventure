@@ -17,6 +17,12 @@ public class LerpTextMeshPro : MonoBehaviour
         StartCoroutine(UpdateText());
     }
 
+    public void setColor(Color c)
+    {
+        currentColor = c;
+        SetFinalColorForPreviousCharacters();
+    }
+
     IEnumerator UpdateText()
     {
         while (true)
@@ -40,6 +46,7 @@ public class LerpTextMeshPro : MonoBehaviour
         }
     }
 
+    public Color currentColor;
     IEnumerator LerpCharacter()
     {
         if (textMesh.textInfo.characterCount > currentCharIndex)
@@ -53,7 +60,8 @@ public class LerpTextMeshPro : MonoBehaviour
 
                 // Lerp alpha
                 Color32[] newVertexColors = textMesh.textInfo.meshInfo[0].colors32;
-                Color32 c = new Color32(255, 255, 255, (byte)Mathf.Lerp(0, 255, t));
+                Color temp = new Color(currentColor.r, currentColor.g, currentColor.b, t / duration);
+                Color32 c = temp;
                 int materialIndex = textMesh.textInfo.characterInfo[currentCharIndex].materialReferenceIndex;
                 int vertexIndex = textMesh.textInfo.characterInfo[currentCharIndex].vertexIndex;
                 newVertexColors[vertexIndex + 0] = c;
@@ -74,7 +82,7 @@ public class LerpTextMeshPro : MonoBehaviour
     void SetFinalColorForPreviousCharacters()
     {
         Color32[] newVertexColors = textMesh.textInfo.meshInfo[0].colors32;
-        Color32 finalColor = new Color32(255, 255, 255, 255);
+        Color32 finalColor = currentColor;
 
         for (int i = 0; i < currentCharIndex; i++)
         {

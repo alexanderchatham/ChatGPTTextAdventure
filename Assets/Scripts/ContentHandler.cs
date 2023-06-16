@@ -147,12 +147,12 @@ public class ContentHandler : MonoBehaviour
             }
             
         }
-        /*
+        
         var vert = paragraph.transform.parent.GetComponent<VerticalLayoutGroup>();
         vert.enabled = false;
         await Task.Delay(100);
         vert.enabled = true;
-        */
+        
         if (current != null)
         {
 
@@ -178,6 +178,7 @@ public class ContentHandler : MonoBehaviour
                         b.transform.parent.gameObject.SetActive(false);
                         if(String.IsNullOrEmpty(current.C))
                         c.transform.parent.gameObject.SetActive(false);
+                        restartButton.GetComponentInChildren<TextMeshProUGUI>().text = "End";
                         restartButton.SetActive(true);
                     }
                     else

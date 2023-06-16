@@ -18,6 +18,10 @@ public class GameSettingsEditor : Editor
         {
             gameSettings.IncrementGradientIndex();
         }
+        if (GUILayout.Button("Increment Color Index"))
+        {
+            gameSettings.IncrementColorIndex();
+        }
     }
 }
 #endif
