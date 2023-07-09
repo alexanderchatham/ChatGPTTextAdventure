@@ -30,8 +30,9 @@ public class ContentHandler : MonoBehaviour
 
     private bool madeChoice = false;
     private string choiceFormatString = 
+        " is the option the player chose in the following paragraph, use this and create a new paragraph and more choices for the player." +
         " If using quotes in the story use ' instead of \"." +
-        " Please continue the story by writing a new paragraph and updating the summary of the story and use this JSON from the last section of the story to format your response for the next section of the story. Remember to only send back the response JSON. \n";
+        " Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation. Only send one JSON object for the next part of the story \n";
 
 
     public ScrollRect scrollRect;
@@ -65,9 +66,7 @@ public class ContentHandler : MonoBehaviour
 
     public string choice_prompt_format(string option)
     {
-        choice = option + " is the option the player chose in the following paragraph, use this when creating the new paragraph. ";
-        //choice += " The current paragraph for the story is: " + current.paragraph;
-        choice += choiceFormatString + StreamResponse.finalString + "\n\n[Remember to ONLY return JSON] \n";
+        choice = StreamResponse.finalString + option + choiceFormatString;
         return choice;
     }
 
@@ -117,7 +116,7 @@ public class ContentHandler : MonoBehaviour
     {
         await Task.Delay(1000);
         string s = StreamResponse.finalString;
-        Debug.Log(s);
+        Debug.Log(s );
         try
         {
             current = JsonUtility.FromJson<story>(s);
@@ -173,11 +172,11 @@ public class ContentHandler : MonoBehaviour
                     {
                         Debug.Log("no options found");
                         if(String.IsNullOrEmpty(current.A))
-                        a.transform.parent.gameObject.SetActive(false);
+                            a.transform.parent.gameObject.SetActive(false);
                         if(String.IsNullOrEmpty(current.B))
-                        b.transform.parent.gameObject.SetActive(false);
+                            b.transform.parent.gameObject.SetActive(false);
                         if(String.IsNullOrEmpty(current.C))
-                        c.transform.parent.gameObject.SetActive(false);
+                            c.transform.parent.gameObject.SetActive(false);
                         restartButton.GetComponentInChildren<TextMeshProUGUI>().text = "End";
                         restartButton.SetActive(true);
                     }

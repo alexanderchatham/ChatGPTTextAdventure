@@ -9,13 +9,15 @@ public class LerpTextMeshPro : MonoBehaviour
     private TextMeshProUGUI textMesh;
     private bool isLerping = false;
     private int currentCharIndex = 0;
+    private Coroutine lerpCo;
     [SerializeField] private TextMeshProUGUI ghostText;
 
     void Awake()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
-        StartCoroutine(UpdateText());
+        lerpCo = StartCoroutine(UpdateText());
     }
+
 
     public void setColor(Color c)
     {

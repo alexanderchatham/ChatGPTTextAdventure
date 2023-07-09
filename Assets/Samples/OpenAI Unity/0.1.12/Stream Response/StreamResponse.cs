@@ -23,7 +23,7 @@ namespace OpenAI
             systemMessage = new ChatMessage()
             {
                 Role = "user",
-                Content = "You are an assistant that only speaks JSON. Do not write normal text."
+                Content = "You are an Text adventure game generator."
             };
             TextAsset textAsset;
             if (model == GPTModel.GPT4)
@@ -37,6 +37,9 @@ namespace OpenAI
         public void StartStory()
         {
             FindObjectOfType<MenuManager>().ShowGamePanel();
+            text.text = "";
+            handler.buttons.alpha = 0;
+            handler.buttons.interactable = false;
             SendMessage(BuildInitialMessage()); // Replace the old SendMessage call
 
         }
@@ -48,7 +51,7 @@ namespace OpenAI
             return message;
         }
 
-        private string initialMessage = "Use this JSON format for your response. { \"character\": \"character name\", \"summary\": \"summarize the entire story so far here\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\"  } ";
+        private string initialMessage = "Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.. { \"character\": \"character name\", \"summary\": \"summarize the entire story so far here\", \"paragraph\":\"current part of the story goes here\",     \"A\": \"New Adventure\",     \"B\": \"New Adventure\",     \"C\": \"New Adventure\"  } ";
         public enum GPTModel
         {
             GPT35,
@@ -85,6 +88,7 @@ namespace OpenAI
 
 
         }
+
         public string finalString;
         private void HandleResponse(List<CreateChatCompletionResponse> responses)
         {
