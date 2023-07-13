@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using TMPro;
@@ -15,8 +16,9 @@ public class LerpTextMeshPro : MonoBehaviour
     void Awake()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
-        lerpCo = StartCoroutine(UpdateText());
+        StartCoroutine(UpdateText());
     }
+
 
 
     public void setColor(Color c)
@@ -44,7 +46,7 @@ public class LerpTextMeshPro : MonoBehaviour
         {
             
             isLerping = true;
-            StartCoroutine(LerpCharacter());
+            lerpCo = StartCoroutine(LerpCharacter());
         }
     }
 
@@ -56,7 +58,7 @@ public class LerpTextMeshPro : MonoBehaviour
             float t = 0f;
 
             
-            while (t < duration)
+            while (t < duration && currentCharIndex< textMesh.text.Length-2)
             {
                 t += Time.deltaTime;
 
@@ -98,9 +100,19 @@ public class LerpTextMeshPro : MonoBehaviour
         textMesh.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
     }
 
+    public void ShowAll()
+    {
+        if (ContentHandler.instance.finished)
+        {
+            currentCharIndex = textMesh.text.Length - 1;
+            SetFinalColorForPreviousCharacters();
+        }
+    }
     public void Reset()
     {
-        currentCharIndex = 0;
-        textMesh.text = "";
+                
+            SetFinalColorForPreviousCharacters();
+            currentCharIndex = 0;
+            textMesh.text = "";
     }
 }

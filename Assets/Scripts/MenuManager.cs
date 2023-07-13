@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 public class MenuManager : MonoBehaviour
@@ -8,8 +9,11 @@ public class MenuManager : MonoBehaviour
     public CanvasGroup settingsPanel;
     public CanvasGroup loadGamePanel;
     public CanvasGroup gamePanel;
+    public CanvasGroup leaderboardPanel;
+    public CanvasGroup dailyRewardsPanel;
     public Button continueButton;
 
+    public List<CanvasGroup> Panels;
     private story lastStory;
 
     public float fadeTime = 1f; // Fade duration in seconds
@@ -18,7 +22,6 @@ public class MenuManager : MonoBehaviour
     {
         checkForSave();
         ShowMainMenu();
-        
     }
 
     void checkForSave()
@@ -56,48 +59,51 @@ public class MenuManager : MonoBehaviour
         panel.blocksRaycasts = false;
     }
 
+    void SetAllInactive()
+    {
+        foreach (var VARIABLE in Panels)
+        {
+            SetPanelInactive(VARIABLE);
+        }
+    }
+
     public void ShowMainMenu()
     {
-        SetPanelInactive(newGamePanel);
-        SetPanelInactive(loadGamePanel);
-        SetPanelInactive(gamePanel);
-        SetPanelInactive(settingsPanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(mainMenuPanel));
     }
     public void ShowSettingsPanel()
     {
-        SetPanelInactive(newGamePanel);
-        SetPanelInactive(loadGamePanel);
-        SetPanelInactive(gamePanel);
-        SetPanelInactive(mainMenuPanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(settingsPanel));
     }
 
 
     public void ShowNewGamePanel()
     {
-        SetPanelInactive(mainMenuPanel);
-        SetPanelInactive(loadGamePanel);
-        SetPanelInactive(gamePanel);
-        SetPanelInactive(settingsPanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(newGamePanel));
     }
 
     public void ShowGamePanel()
     {
-        SetPanelInactive(mainMenuPanel);
-        SetPanelInactive(loadGamePanel);
-        SetPanelInactive(newGamePanel);
-        SetPanelInactive(settingsPanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(gamePanel));
+    }
+    public void ShowLeaderboardPanel()
+    {
+        SetAllInactive();
+        StartCoroutine(FadeIn(leaderboardPanel));
+    }
+    public void ShowDailyRewardsPanel()
+    {
+        SetAllInactive();
+        StartCoroutine(FadeIn(dailyRewardsPanel));
     }
 
     public void ShowLoadGamePanel()
     {
-        SetPanelInactive(mainMenuPanel);
-        SetPanelInactive(newGamePanel);
-        SetPanelInactive(gamePanel);
-        SetPanelInactive(settingsPanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(loadGamePanel));
     }
 
@@ -106,9 +112,7 @@ public class MenuManager : MonoBehaviour
         // You can add the logic of loading the last game here
         // e.g. gameManager.LoadLastGame();
 
-        SetPanelInactive(mainMenuPanel);
-        SetPanelInactive(newGamePanel);
-        SetPanelInactive(loadGamePanel);
+        SetAllInactive();
         StartCoroutine(FadeIn(gamePanel));
     }
 }

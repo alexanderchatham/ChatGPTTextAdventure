@@ -6,7 +6,14 @@ using TMPro;
 using System.Collections.Generic;
 using System.Threading;
 using System.Text.RegularExpressions;
+using Unity.Services.Authentication;
+using Unity.Services.CloudCode;
+using Unity.Services.Core;
 using System.Threading.Tasks;
+using Unity.Services.Analytics;
+using Unity.Services.Core;
+using Unity.Services.Samples.DailyRewards;
+using UnityEngine.Analytics;
 
 namespace OpenAI
 {
@@ -18,13 +25,36 @@ namespace OpenAI
         private OpenAIApi openai;
         private CancellationTokenSource token = new CancellationTokenSource();
         private ChatMessage systemMessage;
+        public static StreamResponse instance;
+        private async void Awake()
+        {
+            if(instance == null)
+                instance = this;
+            else
+            {
+                Destroy(gameObject);
+            }
+            
+            await UnityServices.InitializeAsync();
+            if(!AuthenticationService.Instance.IsSignedIn)
+                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            var key = await CloudCodeService.Instance.CallEndpointAsync("GetKey", null);
+            openai = new OpenAIApi(key);
+            AnalyticsService.Instance.StartDataCollection();
+            EconomyCode.instance.Initialize();
+            DailyRewardsSceneManager.instance.StartDailyRewards();
+            LeaderboardManager.instance.LoadLeaderboard();
+        }
+
         private void Start()
         {
+            
             systemMessage = new ChatMessage()
             {
                 Role = "user",
                 Content = "You are an Text adventure game generator."
             };
+            /*
             TextAsset textAsset;
             if (model == GPTModel.GPT4)
                 textAsset = Resources.Load<TextAsset>("APIKEYGPT4");
@@ -33,21 +63,39 @@ namespace OpenAI
             //Model = "gpt-3.5-turbo",
             var _apiKey = textAsset.text;
             openai = new OpenAIApi(_apiKey);
+            */
         }
         public void StartStory()
         {
+            if (EconomyCode.instance.getTokens() <= 0)
+            {
+                EconomyCode.instance.showTokenOptions();
+                return;
+            }
+                
             FindObjectOfType<MenuManager>().ShowGamePanel();
             text.text = "";
             handler.buttons.alpha = 0;
             handler.buttons.interactable = false;
+            handler.finished = false;
             SendMessage(BuildInitialMessage()); // Replace the old SendMessage call
+        
 
         }
         private string BuildInitialMessage()
         {
             //the story length is {uiManager.GetStoryLength()},
             // Use the settings from the UIManager to build the initial message
-            string message = $"You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. The game theme is {uiManager.GetTheme()}, the character's name is {uiManager.GetCharacterName()}, the character's gender is {uiManager.GetCharacterGender()},  the genre is {uiManager.GetGenre()}. " + initialMessage;
+            Dictionary<string, object> parameters = new Dictionary<string, object>()
+            {
+                {"theme",uiManager.GetTheme() },
+                {"setting",uiManager.GetGenre() },
+                {"gender",uiManager.GetCharacterGender() },
+            };
+            AnalyticsService.Instance.CustomData("storyStarted", parameters);
+            string message = $"You are now a text adventure game generator. Generate a paragraph for a new text adventure game along with 3 choices. " +
+                             $"The game theme is {uiManager.GetTheme()}, the character's name is {uiManager.GetCharacterName()}, the character's gender is {uiManager.GetCharacterGender()}," +
+                             $"  the genre is {uiManager.GetGenre()}. " + initialMessage;
             return message;
         }
 

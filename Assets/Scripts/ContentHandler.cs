@@ -19,7 +19,19 @@ public class ContentHandler : MonoBehaviour
     public GameObject restartButton;
     private OpenAI.StreamResponse StreamResponse;
 
-    
+    public static ContentHandler instance;
+
+    private void Awake()
+    {
+        if(instance == null)
+            instance = this;
+        else
+        {
+            Destroy(instance);
+        }
+        
+    }
+
     private void Start()
     {
         StreamResponse = GetComponent<OpenAI.StreamResponse>();
@@ -44,6 +56,11 @@ public class ContentHandler : MonoBehaviour
     private string choice;
     public void selectOption(string option)
     {
+        if (EconomyCode.instance.getTokens() <= 0)
+        {
+            EconomyCode.instance.showTokenOptions();
+            return;
+        }
         ScrollToTop();
         FindObjectOfType<LerpTextMeshPro>().Reset();
         Debug.Log(option);
@@ -61,6 +78,7 @@ public class ContentHandler : MonoBehaviour
         if (option =="B")
             choice+= current.B;
         */
+        finished = false;
         StreamResponse.SendMessage(choice);
     }
 
@@ -79,36 +97,32 @@ public class ContentHandler : MonoBehaviour
             string json = match.Value;
             return json;
         }
-        else
+        print("no json found trying again");
+        // No valid JSON object found
+        match = Regex.Match(s+"}", @"\{.*\}", RegexOptions.Singleline);
+        if (match.Success)
         {
-            print("no json found trying again");
-            // No valid JSON object found
-            match = Regex.Match(s+"}", @"\{.*\}", RegexOptions.Singleline);
-            if (match.Success)
-            {
-                string json = match.Value;
-                return json;
-            }
-            else
-            {
-                match = Regex.Match(s + "\"}", @"\{.*\}", RegexOptions.Singleline);
-                if (match.Success)
-                {
-                    string json = match.Value;
-                    return json;
-                }
-                else
-                {
-                    print("no json found");
-                    // No valid JSON object found
-                    return null;
-                }
-            }
+            string json = match.Value;
+            return json;
         }
+        match = Regex.Match(s + "\"}", @"\{.*\}", RegexOptions.Singleline);
+        if (match.Success)
+        {
+            string json = match.Value;
+            return json;
+        }
+        print("no json found");
+        // No valid JSON object found
+        return null;
+                
+        
     }
+    
 
+    public bool finished = false;
     public void contentLinker()
     {
+        finished = true;
         getContent();
     }
 
@@ -116,7 +130,7 @@ public class ContentHandler : MonoBehaviour
     {
         await Task.Delay(1000);
         string s = StreamResponse.finalString;
-        Debug.Log(s );
+        Debug.Log(s);
         try
         {
             current = JsonUtility.FromJson<story>(s);
@@ -154,8 +168,7 @@ public class ContentHandler : MonoBehaviour
         
         if (current != null)
         {
-
-
+            
             try
             {
                 if (!String.IsNullOrEmpty(current.paragraph))
