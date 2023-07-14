@@ -245,12 +245,14 @@ public class EconomyCode : MonoBehaviour
     {
         print("rewarding ad watch");
         UpdatePlayersBalance("STORY_TOKENS", tokens += 10);
+        PurchasingPanel.SetActive(false);
     }
 
     public void BoughtTokens(int i)
     {
         print($"Purchased {i} Tokens");
         UpdatePlayersBalance("STORY_TOKENS", tokens += i);
+        PurchasingPanel.SetActive(false);
         
     }
 
